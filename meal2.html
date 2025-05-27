@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>智慧餐點推薦系統</title>
+  <style>
+    body {
+      font-family: 'Georgia', 'Noto Serif TC', serif;
+    }
+    .section { display: none; }
+    .active { display: block; }
+  </style>
+</head>
+<header class="flex justify-between items-center px-6 py-4 bg-white shadow-md">
+  <div class="text-2xl font-bold text-[#4b3b2a]">ncu</div>
+  <div class="space-x-4">
+    
+    <button onclick="toggleMyList()" class="text-[#4b3b2a] hover:underline">我的清單</button>
+  </div>
+</header>
+
+<body class="bg-[#f8f5f0] text-[#2c2c2c]">
+<section class="h-[300px] bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1600&q=80');">
+</section>
+
+
+  <main class="max-w-2xl mx-auto px-6 py-10 space-y-10">
+
+<div id="enter" class="section active flex flex-col items-center pt-8 pb-20 px-6 text-center">
+
+  <div class="space-y-6">
+    <img src="https://img.icons8.com/ios-filled/100/4b3b2a/restaurant.png" alt="logo" class="mx-auto w-20 h-20">
+    <h1 id="mainTitle" class="text-4xl font-bold text-[#4b3b2a]">智慧餐點推薦系統</h1>
+    <p id="mainSubtitle" class="text-gray-700 text-lg">根據你的預算、熱量與營養需求，推薦最適合的餐點組合</p>
+
+
+    <button id="loginStartBtn" onclick="startLogin()" class="mt-4 w-full max-w-xs bg-[#4b3b2a] text-white text-lg py-3 rounded-full hover:bg-[#2f261c] transition">
+     立即登入使用
+    </button>
+
+
+  </div>
+</div>
+
+
+
+
+
+    <div id="login" class="section text-center space-y-4">
+      <p class="text-lg">已有帳號？</p>
+      <div class="flex justify-center gap-4">
+        <button onclick="showSection('inputLogin')" class="border border-gray-500 px-5 py-2 rounded-full hover:bg-gray-100">是</button>
+        <button onclick="showSection('registerPrompt')" class="border border-gray-500 px-5 py-2 rounded-full hover:bg-gray-100">否</button>
+      </div>
+    </div>
+
+    <div id="inputLogin" class="section space-y-4">
+      <input type="email" id="loginAccount" placeholder="帳號（Email）" class="w-full p-3 border border-gray-300 rounded-lg">
+      <input type="password" id="loginPassword" placeholder="密碼" class="w-full p-3 border border-gray-300 rounded-lg">
+      <p class="text-sm text-red-500" id="loginError"></p>
+      <button onclick="login()" class="w-full bg-[#4b3b2a] text-white py-3 rounded-full hover:bg-[#2f261c] transition">登入</button>
+    </div>
+
+    <div id="registerPrompt" class="section text-center space-y-3">
+      <p>尚未註冊，請建立帳戶</p>
+      <button onclick="showSection('requireFormat')" class="bg-[#4b3b2a] text-white px-6 py-2 rounded-full hover:bg-[#2f261c]">建立帳戶</button>
+    </div>
+
+    <div id="requireFormat" class="section space-y-3">
+      <input type="email" id="registerAccount" placeholder="帳號（Email）" class="w-full p-3 border border-gray-300 rounded-lg">
+      <input type="password" id="registerPassword" placeholder="密碼（至少 6 碼）" class="w-full p-3 border border-gray-300 rounded-lg">
+      <p class="text-sm text-red-500" id="registerError"></p>
+      <button onclick="register()" class="w-full bg-[#4b3b2a] text-white py-3 rounded-full hover:bg-[#2f261c] transition">送出</button>
+    </div>
+
+    <div id="registerSuccess" class="section text-center space-y-3">
+      <p class="text-green-700 text-lg">註冊成功！</p>
+      <button onclick="showSection('inputLogin')" class="bg-[#4b3b2a] text-white px-6 py-2 rounded-full hover:bg-[#2f261c]">立即登入</button>
+    </div>
+
+    <div id="loginSuccess" class="section space-y-10">
+      
+
+      <section class="py-10 bg-white">
+        <div class="max-w-3xl mx-auto px-6 space-y-0.1">
+
+          <div id="mainSection" class="bg-[#f9f9f9] p-6 rounded-2xl shadow space-y-6">
+            <h2 class="text-3xl font-semibold text-center">你想規劃一餐還是一整天？</h2>
+            <button class="w-full bg-yellow-500 text-white py-3 rounded-full hover:bg-yellow-600 transition" onclick="chooseMode('one')">一餐</button>
+            <button class="w-full bg-yellow-500 text-white py-3 rounded-full hover:bg-yellow-600 transition" onclick="chooseMode('all')">一整天</button>
+          </div>
+
+          <div id="oneMealInputSection" class="hidden bg-[#f9f9f9] p-6 rounded-2xl shadow space-y-4">
+            <h2 class="text-2xl font-semibold text-center">請輸入以下條件（以一餐計算）</h2>
+            <input type="number" id="onePrice" placeholder="預算上限（元）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <input type="number" id="oneCalories" placeholder="熱量上限（kcal）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <input type="number" id="oneProtein" placeholder="蛋白質最少（g）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <button class="w-full bg-yellow-500 text-white py-3 rounded-full hover:bg-yellow-600 transition" onclick="evaluateOneMeal()">確認條件</button>
+          </div>
+
+          <div id="resultSection" class="hidden bg-[#f9f9f9] p-6 rounded-2xl shadow space-y-4">
+            <h2 class="text-xl font-semibold text-center">推薦結果</h2>
+            <div class="text-center text-gray-700" id="resultText"></div>
+            <p class="text-center">你想吃這個嗎？</p>
+            <div class="flex gap-4">
+              <button class="flex-1 bg-yellow-500 text-white py-3 rounded-full hover:bg-yellow-600 transition" onclick="acceptMeal()">想吃</button>
+              <button class="flex-1 border border-gray-500 py-3 rounded-full hover:bg-gray-100 transition" onclick="retryMeal()">換一個</button>
+            </div>
+          </div>
+
+          <div id="mealCountSelection" class="hidden bg-[#f9f9f9] p-6 rounded-2xl shadow space-y-4">
+            <h2 class="text-2xl font-semibold text-center">請選擇今天要安排幾餐</h2>
+            <div class="flex justify-center gap-4">
+              <button class="bg-yellow-500 text-white px-5 py-2 rounded-full hover:bg-yellow-600" onclick="selectMealCount(2)">兩餐</button>
+              <button class="bg-yellow-500 text-white px-5 py-2 rounded-full hover:bg-yellow-600" onclick="selectMealCount(3)">三餐</button>
+              <button class="bg-yellow-500 text-white px-5 py-2 rounded-full hover:bg-yellow-600" onclick="selectMealCount(4)">四餐</button>
+            </div>
+          </div>
+
+          <div id="allDayInputSection" class="hidden bg-[#f9f9f9] p-6 rounded-2xl shadow space-y-4">
+            <h2 class="text-2xl font-semibold text-center">請輸入以下條件（以一整天總合計算）</h2>
+            <input type="number" id="targetPrice" placeholder="預算上限（元）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <input type="number" id="targetCalories" placeholder="熱量上限（kcal）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <input type="number" id="targetProtein" placeholder="蛋白質最少（g）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <button class="w-full bg-yellow-500 text-white py-3 rounded-full hover:bg-yellow-600 transition" onclick="evaluateCondition()">確認條件</button>
+          </div>
+
+          <div id="allDayResultSection" class="hidden space-y-10"></div>
+
+        </div>
+      </section>
+    </div>
+  </main>
+
+<section class="bg-[#1f2a33] text-white py-12 px-6">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-sm leading-relaxed">
+    
+    <div>
+      <h3 class="font-bold mb-2">關於我們</h3>
+      <p>本系統由中央大學學生團隊開發，目的是解決日常生活中「不知道吃什麼」的煩惱。我們希望透過智慧推薦機制，幫助使用者快速選擇適合自己的餐點。</p>
+    </div>
+
+    <div>
+      <h3 class="font-bold mb-2">我們的理念</h3>
+      <p>結合預算、營養與熱量等條件進行推薦，打造一套便利且客觀的餐點決策工具，讓每一餐都吃得剛剛好、不再煩惱。</p>
+    </div>
+
+    <div>
+      <h3 class="font-bold mb-2">適合誰使用？</h3>
+      <p>不管你是學生、上班族、健身族群，或只是選擇困難症候群，本系統都能提供個人化建議，讓每日飲食變得更簡單、更健康。</p>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto mt-10 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
+    <div class="space-x-4">
+      
+    </div>
+    <p class="mt-4 md:mt-0">©2025 中央大學 智慧餐點推薦系統團隊. 版權所有.</p>
+  </div>
+</section>
+
+
+
+  <footer class="text-center text-sm text-gray-600 py-8 border-t border-gray-300">
+    © 2025 智慧餐點推薦系統｜聯絡信箱：example@email.com
+  </footer>
+
+  <script>
+    let mealCount = 0;
+    let confirmedMeals = {};
+
+    function startLogin() {
+  // 隱藏標題、副標與按鈕
+      document.getElementById("mainTitle").style.display = "none";
+      document.getElementById("mainSubtitle").style.display = "none";
+      document.getElementById("loginStartBtn").style.display = "none";
+
+  // 切換到登入選擇區塊
+      showSection("login");
+    }
+
+
+
+    function showSection(id) {
+      document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    function login() {
+  const email = document.getElementById("loginAccount").value;
+  const pw = document.getElementById("loginPassword").value;
+  if (email && pw.length >= 6) {
+    alert("登入成功，歡迎回來！");
+    showSection("loginSuccess");
+  } else {
+    document.getElementById("loginError").textContent = "請輸入有效帳號與密碼";
+  }
+}
+
+
+    function register() {
+      const email = document.getElementById("registerAccount").value;
+      const pw = document.getElementById("registerPassword").value;
+      if (email && pw.length >= 6) {
+        showSection("registerSuccess");
+      } else {
+        document.getElementById("registerError").textContent = "請輸入有效帳號與 6 碼以上密碼";
+      }
+    }
+
+    function chooseMode(mode) {
+      document.getElementById("mainSection").classList.add("hidden");
+      if (mode === 'all') {
+        document.getElementById("allDayInputSection").classList.remove("hidden");
+      } else {
+        document.getElementById("oneMealInputSection").classList.remove("hidden");
+      }
+    }
+
+    function evaluateOneMeal() {
+      const sample = { price: 120, cal: 600, protein: 30 };
+      document.getElementById("oneMealInputSection").classList.add("hidden");
+      document.getElementById("resultSection").classList.remove("hidden");
+      document.getElementById("resultText").innerHTML = `價錢：$${sample.price}<br>熱量：${sample.cal} kcal<br>蛋白質：${sample.protein} g`;
+    }
+
+    function retryMeal() {
+      const samples = [
+        { price: 110, cal: 580, protein: 29 },
+        { price: 140, cal: 640, protein: 33 }
+      ];
+      const pick = samples[Math.floor(Math.random() * samples.length)];
+      document.getElementById("resultText").innerHTML = `價錢：$${pick.price}<br>熱量：${pick.cal} kcal<br>蛋白質：${pick.protein} g`;
+    }
+
+    function acceptMeal() {
+      alert("推薦完成，祝你用餐愉快！");
+      location.reload();
+    }
+
+    function evaluateCondition() {
+      document.getElementById("allDayInputSection").classList.add("hidden");
+      document.getElementById("mealCountSelection").classList.remove("hidden");
+    }
+
+    function selectMealCount(count) {
+      mealCount = count;
+      confirmedMeals = {};
+      document.getElementById("mealCountSelection").classList.add("hidden");
+      const container = document.getElementById("allDayResultSection");
+      container.innerHTML = `<h2 class="text-2xl font-semibold text-center">推薦${count}餐組合</h2>`;
+      for (let i = 0; i < count; i++) {
+        const mealId = String.fromCharCode(65 + i);
+        confirmedMeals[mealId] = false;
+        const mealBlock = document.createElement("div");
+        mealBlock.className = "space-y-4 bg-[#f9f9f9] p-6 rounded-2xl shadow";
+        mealBlock.innerHTML = `
+          <div id="meal${mealId}" class="mealContent"></div>
+          <div class="flex gap-2">
+            <button class="flex-1 border border-gray-500 py-2 rounded-full hover:bg-gray-100 transition" onclick="reselectMeal('${mealId}')">重選 ${mealId}</button>
+            <button class="flex-1 bg-yellow-500 text-white py-2 rounded-full hover:bg-yellow-600 transition" onclick="confirmMeal('${mealId}')">確定 ${mealId}</button>
+          </div>`;
+        container.appendChild(mealBlock);
+        loadMeal(mealId);
+      }
+      const buttonBlock = document.createElement("div");
+      buttonBlock.className = "flex gap-4 pt-4";
+      buttonBlock.innerHTML = `
+        <button class="flex-1 border border-red-500 text-red-600 py-3 rounded-full hover:bg-red-50 transition" onclick="restartAllMeals()">全部重選</button>
+        <button id="finalConfirmBtn" class="flex-1 bg-green-600 text-white py-3 rounded-full hover:bg-green-700 transition" onclick="finalConfirm()" disabled>完成推薦</button>`;
+      container.appendChild(buttonBlock);
+      container.classList.remove("hidden");
+    }
+
+    function restartAllMeals() {
+      document.getElementById("allDayResultSection").classList.add("hidden");
+      document.getElementById("mealCountSelection").classList.remove("hidden");
+    }
+
+    function loadMeal(mealId) {
+      const samples = [
+        { price: 120, cal: 600, protein: 30 },
+        { price: 130, cal: 650, protein: 32 },
+        { price: 110, cal: 550, protein: 28 }
+      ];
+      const pick = samples[Math.floor(Math.random() * samples.length)];
+      document.getElementById("meal" + mealId).innerHTML =
+        `<strong>${mealId} 餐</strong><br>
+         價錢：$${pick.price}<br>
+         熱量：${pick.cal} kcal<br>
+         蛋白質：${pick.protein} g`;
+      confirmedMeals[mealId] = false;
+      updateFinalConfirm();
+    }
+
+    function reselectMeal(mealId) {
+      loadMeal(mealId);
+    }
+
+    function confirmMeal(mealId) {
+      confirmedMeals[mealId] = true;
+      alert(`${mealId} 餐已確認！`);
+      updateFinalConfirm();
+    }
+
+    function updateFinalConfirm() {
+      const allConfirmed = Object.values(confirmedMeals).every(val => val);
+      const confirmBtn = document.getElementById("finalConfirmBtn");
+      if (confirmBtn) confirmBtn.disabled = !allConfirmed;
+    }
+
+    function finalConfirm() {
+      alert("整天推薦已完成！");
+      location.reload();
+    }
+  </script>
+</body>
+</html>
