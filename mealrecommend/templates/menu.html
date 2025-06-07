@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>今日菜單</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f8f5f0] text-[#2c2c2c] px-6 py-10">
+  <h1 class="text-3xl font-bold text-center mb-8">🍱 今日菜單推薦</h1>
+  <div id="menuDisplay" class="space-y-6 max-w-xl mx-auto"></div>
+
+  <script>
+    const data = JSON.parse(localStorage.getItem("todayMenu"));
+    const container = document.getElementById("menuDisplay");
+
+    if (!data) {
+      container.innerHTML = "<p class='text-red-600 text-center'>找不到推薦內容，請重新操作。</p>";
+    } else {
+      let total_price = 0, total_cal = 0, total_protein = 0;
+      for (const [key, dish] of Object.entries(data)) {
+        total_price += dish.price;
+        total_cal += dish.calories;
+        total_protein += dish.protein;
+
+        const block = document.createElement("div");
+        block.className = "bg-white p-5 rounded-xl shadow";
+        block.innerHTML = `
+          <h2 class="text-xl font-semibold mb-2">${key} 餐</h2>
+          <p>名稱：${dish.name}</p>
+          <p>價格：$${dish.price}</p>
+          <p>熱量：${dish.calories} kcal</p>
+          <p>蛋白質：${dish.protein} g</p>
+        `;
+        container.appendChild(block);
+      }
+
+      const summary = document.createElement("div");
+      summary.className = "bg-yellow-100 p-5 rounded-xl shadow text-center font-medium";
+      summary.innerHTML = `
+        🔸 <strong>總計：</strong><br>
+        價格：$${total_price}、熱量：${total_cal} kcal、蛋白質：${total_protein} g
+      `;
+      container.appendChild(summary);
+    }
+  </script>
+</body>
+</html>

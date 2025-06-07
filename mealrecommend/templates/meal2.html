@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>智慧餐點推薦系統</title>
+  <style>
+    body {
+      font-family: 'Georgia', 'Noto Serif TC', serif;
+    }
+  </style>
+</head>
+<body class="bg-[#f8f5f0] text-[#2c2c2c]">
+
+  <section class="text-center py-16 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1600&q=80');">
+    <div class="bg-black bg-opacity-50 p-6 rounded-xl inline-block">
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-3">智慧餐點推薦系統</h1>
+      <p class="text-lg text-gray-200">依據喜好推薦餐點</p>
+    </div>
+  </section>
+
+  <main class="max-w-2xl mx-auto px-6 py-10 space-y-10">
+
+    <div id="enter" class="section text-center space-y-4">
+      <button onclick="showSection('login')" class="bg-[#4b3b2a] text-white px-6 py-3 rounded-full hover:bg-[#2f261c] transition">登入系統</button>
+    </div>
+
+    <div id="login" class="section hidden text-center space-y-4">
+      <p class="text-lg">已有帳號？</p>
+      <div class="flex justify-center gap-4">
+        <button onclick="showSection('inputLogin')" class="border border-gray-500 px-5 py-2 rounded-full hover:bg-gray-100">是</button>
+        <button onclick="showSection('registerPrompt')" class="border border-gray-500 px-5 py-2 rounded-full hover:bg-gray-100">否</button>
+      </div>
+    </div>
+
+    <div id="inputLogin" class="section hidden space-y-4">
+      <input type="email" id="loginAccount" placeholder="帳號（Email）" class="w-full p-3 border border-gray-300 rounded-lg">
+      <input type="password" id="loginPassword" placeholder="密碼" class="w-full p-3 border border-gray-300 rounded-lg">
+      <p class="text-sm text-red-500" id="loginError"></p>
+      <button onclick="login()" class="w-full bg-[#4b3b2a] text-white py-3 rounded-full hover:bg-[#2f261c] transition">登入</button>
+    </div>
+
+    <div id="registerPrompt" class="section hidden text-center space-y-3">
+      <p>尚未註冊，請建立帳戶</p>
+      <button onclick="showSection('requireFormat')" class="bg-[#4b3b2a] text-white px-6 py-2 rounded-full hover:bg-[#2f261c]">建立帳戶</button>
+    </div>
+
+    <div id="requireFormat" class="section hidden space-y-3">
+      <input type="email" id="registerAccount" placeholder="帳號（Email）" class="w-full p-3 border border-gray-300 rounded-lg">
+      <input type="password" id="registerPassword" placeholder="密碼（至少 6 碼）" class="w-full p-3 border border-gray-300 rounded-lg">
+      <p class="text-sm text-red-500" id="registerError"></p>
+      <button onclick="register()" class="w-full bg-[#4b3b2a] text-white py-3 rounded-full hover:bg-[#2f261c] transition">送出</button>
+    </div>
+
+    <div id="registerSuccess" class="section hidden text-center space-y-3">
+      <p class="text-green-700 text-lg">註冊成功！</p>
+      <button onclick="showSection('inputLogin')" class="bg-[#4b3b2a] text-white px-6 py-2 rounded-full hover:bg-[#2f261c]">立即登入</button>
+    </div>
+
+    <div id="loginSuccess" class="section hidden space-y-10">
+      <p id="welcomeText" class="text-center text-lg">登入成功，歡迎回來！</p>
+
+      <section class="py-10 bg-white">
+        <div class="max-w-3xl mx-auto px-6 space-y-16">
+
+          <div id="mainSection" class="bg-[#f9f9f9] p-6 rounded-2xl shadow space-y-6">
+            <h2 class="text-3xl font-semibold text-center">你想規劃一餐還是一整天？</h2>
+            <button class="w-full bg-yellow-500 text-white py-3 rounded-full hover:bg-yellow-600 transition" onclick="chooseMode('one')">一餐</button>
+            <button class="w-full bg-yellow-500 text-white py-3 rounded-full hover:bg-yellow-600 transition" onclick="chooseMode('all')">一整天</button>
+          </div>
+
+          <div id="oneMealInputSection" class="hidden bg-[#f9f9f9] p-6 rounded-2xl shadow space-y-4">
+            <h2 class="text-2xl font-semibold text-center">請輸入以下條件（以一餐計算）</h2>
+            <input type="number" id="onePrice" placeholder="預算上限（元）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <input type="number" id="oneCalories" placeholder="熱量上限（kcal）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <input type="number" id="oneProtein" placeholder="蛋白質最少（g）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <button class="w-full bg-yellow-500 text-white py-3 rounded-full hover:bg-yellow-600 transition" onclick="evaluateOneMeal()">確認條件</button>
+          </div>
+
+          <div id="resultSection" class="hidden bg-[#f9f9f9] p-6 rounded-2xl shadow space-y-4">
+            <h2 class="text-xl font-semibold text-center">推薦結果</h2>
+            <div class="text-center text-gray-700" id="resultText"></div>
+            <p class="text-center">你想吃這個嗎？</p>
+            <div class="flex gap-4">
+              <button class="flex-1 bg-yellow-500 text-white py-3 rounded-full hover:bg-yellow-600 transition" onclick="acceptMeal()">想吃</button>
+              <button class="flex-1 border border-gray-500 py-3 rounded-full hover:bg-gray-100 transition" onclick="retryMeal()">換一個</button>
+            </div>
+          </div>
+
+          <div id="mealCountSelection" class="hidden bg-[#f9f9f9] p-6 rounded-2xl shadow space-y-4">
+            <h2 class="text-2xl font-semibold text-center">請選擇今天要安排幾餐</h2>
+            <div class="flex justify-center gap-4">
+              <button class="bg-yellow-500 text-white px-5 py-2 rounded-full hover:bg-yellow-600" onclick="selectMealCount(2)">兩餐</button>
+              <button class="bg-yellow-500 text-white px-5 py-2 rounded-full hover:bg-yellow-600" onclick="selectMealCount(3)">三餐</button>
+              <button class="bg-yellow-500 text-white px-5 py-2 rounded-full hover:bg-yellow-600" onclick="selectMealCount(4)">四餐</button>
+            </div>
+          </div>
+
+          <div id="allDayInputSection" class="hidden bg-[#f9f9f9] p-6 rounded-2xl shadow space-y-4">
+            <h2 class="text-2xl font-semibold text-center">請輸入以下條件（以一整天總合計算）</h2>
+            <input type="number" id="targetPrice" placeholder="預算上限（元）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <input type="number" id="targetCalories" placeholder="熱量上限（kcal）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <input type="number" id="targetProtein" placeholder="蛋白質最少（g）" class="w-full p-3 border border-gray-300 rounded-lg">
+            <button class="w-full bg-yellow-500 text-white py-3 rounded-full hover:bg-yellow-600 transition" onclick="evaluateCondition()">確認條件</button>
+          </div>
+
+          <div id="allDayResultSection" class="hidden space-y-10"></div>
+
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="text-center text-sm text-gray-600 py-8 border-t border-gray-300">
+    © 2025 智慧餐點推薦系統｜聯絡信箱：example@email.com
+  </footer>
+
+  <script>
+let mealCount = 0;
+let confirmedMeals = {};
+let selectedMeals = {}; // A 餐 B 餐 C 餐 的菜品資訊
+
+function showSection(id) {
+  document.querySelectorAll(".section").forEach(el => el.classList.add("hidden"));
+  const target = document.getElementById(id);
+  if (target) target.classList.remove("hidden");
+}
+
+function login() {
+  const email = document.getElementById("loginAccount").value;
+  const pw = document.getElementById("loginPassword").value;
+  if (email && pw.length >= 6) {
+    showSection("loginSuccess");
+    document.getElementById("welcomeText").style.display = "none"; // ✅ 隱藏歡迎訊息
+  } else {
+    document.getElementById("loginError").textContent = "請輸入有效帳號與密碼";
+  }
+}
+
+function register() {
+  const email = document.getElementById("registerAccount").value;
+  const pw = document.getElementById("registerPassword").value;
+  if (email && pw.length >= 6) {
+    showSection("registerSuccess");
+  } else {
+    document.getElementById("registerError").textContent = "請輸入有效帳號與 6 碼以上密碼";
+  }
+}
+
+function chooseMode(mode) {
+  document.getElementById("mainSection").classList.add("hidden");
+  if (mode === 'all') {
+    document.getElementById("allDayInputSection").classList.remove("hidden");
+  } else {
+    document.getElementById("oneMealInputSection").classList.remove("hidden");
+  }
+}
+
+function evaluateCondition() {
+  const price = parseInt(document.getElementById("targetPrice").value);
+  const cal = parseInt(document.getElementById("targetCalories").value);
+  const protein = parseInt(document.getElementById("targetProtein").value);
+
+  if (isNaN(price) || isNaN(cal) || isNaN(protein)) {
+    alert("請填寫完整條件");
+    return;
+  }
+
+  fetch("/api/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      max_price: price,
+      max_calories: cal,
+      min_protein: protein,
+      combo_size: 3,
+      result_count: 10
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        window.recommendCombos = data.results;
+        showSection("loginSuccess");
+        document.getElementById("mealCountSelection").classList.remove("hidden");
+        document.getElementById("allDayResultSection").classList.remove("hidden");
+        document.getElementById("welcomeText").style.display = "none"; // ✅ 隱藏歡迎訊息
+      } else {
+        alert(data.message || "沒有符合條件的餐點組合");
+      }
+    })
+    .catch(err => {
+      console.error("❌ 發送推薦失敗：", err);
+      alert("後端錯誤，請稍後再試");
+    });
+}
+
+function selectMealCount(count) {
+  mealCount = count;
+  confirmedMeals = {};
+  selectedMeals = {};
+  document.getElementById("mealCountSelection").classList.add("hidden");
+  const container = document.getElementById("allDayResultSection");
+  container.innerHTML = `<h2 class="text-2xl font-semibold text-center">推薦${count}餐組合</h2>`;
+
+  const pool = [...window.recommendCombos];
+  const selected = [];
+  for (let i = 0; i < count && pool.length > 0; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    selected.push(pool.splice(idx, 1)[0]);
+  }
+
+  for (let i = 0; i < selected.length; i++) {
+    const mealId = String.fromCharCode(65 + i);
+    const dish = selected[i];
+    confirmedMeals[mealId] = false;
+    selectedMeals[mealId] = dish;
+
+    const mealBlock = document.createElement("div");
+    mealBlock.className = "space-y-4 bg-[#f9f9f9] p-6 rounded-2xl shadow";
+    mealBlock.innerHTML = `
+      <div id="meal${mealId}" class="mealContent"></div>
+      <div class="flex gap-2">
+        <button class="flex-1 border border-gray-500 py-2 rounded-full hover:bg-gray-100 transition" onclick="reselectMeal('${mealId}')">重選 ${mealId}</button>
+        <button class="flex-1 bg-yellow-500 text-white py-2 rounded-full hover:bg-yellow-600 transition" onclick="confirmMeal('${mealId}')">確定 ${mealId}</button>
+      </div>`;
+    container.appendChild(mealBlock);
+    renderMeal(mealId);
+  }
+
+  const summary = document.createElement("div");
+  summary.id = "summaryBlock";
+  summary.className = "text-center text-lg text-gray-800 mt-6";
+  container.appendChild(summary);
+  updateSummary();
+
+  const buttonBlock = document.createElement("div");
+  buttonBlock.className = "flex gap-4 pt-4";
+  buttonBlock.innerHTML = `
+    <button class="flex-1 border border-red-500 text-red-600 py-3 rounded-full hover:bg-red-50 transition" onclick="restartAllMeals()">全部重選</button>
+    <button id="finalConfirmBtn" class="flex-1 bg-green-600 text-white py-3 rounded-full hover:bg-green-700 transition" onclick="finalConfirm()" disabled>完成推薦</button>`;
+  container.appendChild(buttonBlock);
+
+  showSection("loginSuccess");
+}
+
+function renderMeal(mealId) {
+  const dish = selectedMeals[mealId];
+  document.getElementById("meal" + mealId).innerHTML = `
+    <strong>${mealId} 餐</strong><br>
+    ${dish.name}<br>
+    價錢：$${dish.price}<br>
+    熱量：${dish.calories} kcal<br>
+    蛋白質：${dish.protein} g
+  `;
+}
+
+function updateSummary() {
+  let total_price = 0, total_cal = 0, total_protein = 0;
+  for (let key in selectedMeals) {
+    const dish = selectedMeals[key];
+    total_price += dish.price;
+    total_cal += dish.calories;
+    total_protein += dish.protein;
+  }
+  const summary = document.getElementById("summaryBlock");
+  if (summary) {
+    summary.innerHTML = `
+      <strong>本次推薦總計：</strong><br>
+      價錢：$${total_price}、熱量：${total_cal} kcal、蛋白質：${total_protein} g
+    `;
+  }
+}
+
+function reselectMeal(mealId) {
+  const pool = window.recommendCombos.filter(
+    d => !Object.values(selectedMeals).includes(d)
+  );
+  if (pool.length === 0) return alert("沒有更多可選項了");
+
+  const newDish = pool[Math.floor(Math.random() * pool.length)];
+  selectedMeals[mealId] = newDish;
+  confirmedMeals[mealId] = false;
+  renderMeal(mealId);
+  updateSummary();
+  updateFinalConfirm();
+}
+
+function confirmMeal(mealId) {
+  confirmedMeals[mealId] = true;
+
+    // 移除按鈕，顯示「已確認」文字
+  const mealBlock = document.getElementById("meal" + mealId).parentElement;
+  const buttonRow = mealBlock.querySelector(".flex");
+  if (buttonRow) {
+    buttonRow.remove();
+    const confirmedText = document.createElement("p");
+    confirmedText.className = "text-green-600 font-semibold text-center";
+    confirmedText.textContent = `${mealId} 餐已確認`;
+    mealBlock.appendChild(confirmedText);
+  }
+
+  updateFinalConfirm();
+}
+
+function updateFinalConfirm() {
+  const allConfirmed = Object.values(confirmedMeals).every(val => val);
+  const confirmBtn = document.getElementById("finalConfirmBtn");
+  if (confirmBtn) confirmBtn.disabled = !allConfirmed;
+}
+
+function restartAllMeals() {
+  document.getElementById("allDayResultSection").classList.add("hidden");
+  document.getElementById("mealCountSelection").classList.remove("hidden");
+}
+
+function finalConfirm() {
+  localStorage.setItem("todayMenu", JSON.stringify(selectedMeals));
+  window.location.href = "/menu.html";
+}
+
+function evaluateOneMeal() {
+  const price = parseInt(document.getElementById("onePrice").value);
+  const cal = parseInt(document.getElementById("oneCalories").value);
+  const protein = parseInt(document.getElementById("oneProtein").value);
+
+  if (isNaN(price) || isNaN(cal) || isNaN(protein)) {
+    alert("請填寫完整條件");
+    return;
+  }
+
+  fetch("/api/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      max_price: price,
+      max_calories: cal,
+      min_protein: protein,
+      combo_size: 1,
+      result_count: 5
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.results.length > 0) {
+        const pick = data.results[Math.floor(Math.random() * data.results.length)];
+        document.getElementById("oneMealInputSection").classList.add("hidden");
+        document.getElementById("resultSection").classList.remove("hidden");
+        document.getElementById("resultText").innerHTML =
+          `名稱：${pick.name}<br>價錢：$${pick.price}<br>熱量：${pick.calories} kcal<br>蛋白質：${pick.protein} g`;
+      } else {
+        alert(data.message || "找不到符合條件的餐點");
+      }
+    })
+    .catch(err => {
+      console.error("❌ 一餐推薦錯誤：", err);
+      alert("後端錯誤，請稍後再試");
+    });
+}
+function retryMeal() {
+  const price = parseInt(document.getElementById("onePrice").value);
+  const cal = parseInt(document.getElementById("oneCalories").value);
+  const protein = parseInt(document.getElementById("oneProtein").value);
+
+  fetch("/api/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      max_price: price,
+      max_calories: cal,
+      min_protein: protein,
+      combo_size: 1,
+      result_count: 5
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.results.length > 0) {
+        const pick = data.results[Math.floor(Math.random() * data.results.length)];
+        document.getElementById("resultText").innerHTML =
+          `名稱：${pick.name}<br>價錢：$${pick.price}<br>熱量：${pick.calories} kcal<br>蛋白質：${pick.protein} g`;
+      } else {
+        alert(data.message || "沒有更多推薦");
+      }
+    })
+    .catch(err => {
+      console.error("❌ 換一個推薦錯誤：", err);
+      alert("無法重新推薦，請稍後再試");
+    });
+}
+
+function acceptMeal() {
+  alert("推薦完成，祝你用餐愉快！");
+  location.reload(); // 重新載入頁面或導向主頁也可以換掉
+}
+
+</script>
+
+</body>
+</html>
